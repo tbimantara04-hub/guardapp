@@ -13,7 +13,12 @@ CORS(app)
 
 # Configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, '../db/guard.db')
+
+if os.environ.get('VERCEL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/guard.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, '../db/guard.db')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -56,15 +61,18 @@ def load_students():
 
 load_students()
 
-with app.app_context():
-    db.create_all()
-    # Create default user if none exists
-    if not User.query.first():
-        print("Creating default admin user...")
-        default_user = User(username='admin')
-        default_user.set_password('password123')
-        db.session.add(default_user)
-        db.session.commit()
+try:
+    with app.app_context():
+        db.create_all()
+        # Create default user if none exists
+        if not User.query.first():
+            print("Creating default admin user...")
+            default_user = User(username='admin')
+            default_user.set_password('password123')
+            db.session.add(default_user)
+            db.session.commit()
+except Exception as e:
+    print(f"Database initialization error: {e}")
 
 @app.route('/')
 def index():
