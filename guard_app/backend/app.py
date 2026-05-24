@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from backend.models import db, StudentEntry, AuditLog, User
-from backend.crypto_utils import HybridCrypto
+from models import db, StudentEntry, AuditLog, User
+from crypto_utils import HybridCrypto
 import os
 import json
 import glob
