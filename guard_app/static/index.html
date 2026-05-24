@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Input Mahasiswa - Satpam Poltek SSN</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+    <script>
+        // Check authentication
+        if (!localStorage.getItem('auth_token')) {
+            window.location.href = '/login';
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="logo" style="margin-bottom: 0;">🛡️ Poltek SSN</div>
+                <button onclick="logout()" style="background: rgba(255,100,100,0.2); border: 1px solid rgba(255,100,100,0.5); color: white; padding: 0.4rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; width: auto;">Logout</button>
+            </div>
+            <h1>Gate Control System</h1>
+            <p>Input data mahasiswa keluar kampus</p>
+        </header>
+
+        <main>
+            <div class="mode-toggle-container">
+                <button type="button" class="mode-btn" id="toggleModeBtn">🔄 Beralih ke Keluar Massal</button>
+            </div>
+
+            <div class="card glass">
+                <form id="entryForm">
+                    <div class="input-group">
+                        <label for="guard_id">Guard ID / Username</label>
+                        <input type="text" id="guard_id" placeholder="ID Satpam" required readonly style="background: rgba(0,0,0,0.2); cursor: not-allowed;">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="input-group">
+                        <label for="npm_select" id="student_label">Pilih Mahasiswa (NPM - Nama)</label>
+                        <select id="npm_select" required>
+                            <option value="" disabled selected>Memuat data mahasiswa...</option>
+                        </select>
+                        <div class="help-text" id="massal_help" style="display: none;">*Tahan tombol CTRL (atau seret mouse) untuk memilih lebih dari satu mahasiswa.</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="keterangan">Keterangan / Tujuan</label>
+                        <select id="keterangan" required>
+                            <option value="" disabled selected>Pilih Keterangan...</option>
+                            <option value="Pesiar">Pesiar</option>
+                            <option value="IB (Izin Bermalam)">IB (Izin Bermalam)</option>
+                            <option value="Berobat">Berobat</option>
+                            <option value="Dinas Luar">Dinas Luar</option>
+                            <option value="Pulang Kampung">Pulang Kampung</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submitBtn">
+                        <span class="btn-text">Kirim Data Terenkripsi</span>
+                        <div class="loader" id="loader"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="actions">
+                <a href="/dashboard" class="secondary-btn">Lihat Dashboard</a>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Poltek SSN - Secure Campus Entry System</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        document.getElementById('guard_id').value = localStorage.getItem('auth_user') || '';
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            window.location.href = '/login';
+        }
+    </script>
+    <script src="app.js?v=3"></script>
+</body>
+
+</html>

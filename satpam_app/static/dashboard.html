@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Gate Control</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <div class="wrapper dashboard-wrapper">
+        <header class="dashboard-header">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Logo Poltek SSN" onerror="this.style.display='none'; document.getElementById('dash_logo_text').style.display='inline';">
+                <span id="dash_logo_text" style="display:none;">🛡️ Poltek SSN Gate Control</span>
+            </div>
+            <a href="/" class="link-btn">&larr; Kembali ke Input</a>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="tab-controls">
+                <button class="tab-btn active" onclick="switchTab('data-mahasiswa')">Data Mahasiswa Keluar</button>
+                <button class="tab-btn" onclick="switchTab('audit-log')">Audit Log Satpam</button>
+            </div>
+
+            <div id="data-mahasiswa" class="tab-panel active glass-panel">
+                <div class="header-actions">
+                    <h2>Riwayat Mahasiswa Keluar</h2>
+                    <button class="btn-danger" onclick="markAllReturned()">🗑️ Sudah Kembali Semua</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="mahasiswaTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>NPM</th>
+                                <th>Nama Taruna</th>
+                                <th>Keterangan</th>
+                                <th>Waktu Keluar</th>
+                                <th>Petugas (Satpam ID)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="audit-log" class="tab-panel glass-panel">
+                <h2>System Audit Log</h2>
+                <div class="table-responsive">
+                    <table id="auditTable">
+                        <thead>
+                            <tr>
+                                <th>Log ID</th>
+                                <th>User ID Satpam</th>
+                                <th>Aktivitas</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDashboardData() {
+            try {
+                // Fetch Data Mahasiswa
+                const resMhs = await fetch('/api/get_entries');
+                const dataMhs = await resMhs.json();
+                
+                const tbodyMhs = document.querySelector('#mahasiswaTable tbody');
+                tbodyMhs.innerHTML = dataMhs.map((item, index) => `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><span class="badge badge-primary">${item.npm}</span></td>
+                        <td class="fw-600 name-cell">
+                            ${item.name}
+                            <button class="btn-return" onclick="markReturned(${item.id})">✔ Sudah Kembali</button>
+                        </td>
+                        <td>${item.keterangan || '-'}</td>
+                        <td class="text-muted">${item.timestamp}</td>
+                        <td><span class="badge badge-secondary">${item.guard_id}</span></td>
+                    </tr>
+                `).join('');
+
+                // Fetch Audit Log
+                const resAudit = await fetch('/api/get_audit_logs');
+                const dataAudit = await resAudit.json();
+                
+                const tbodyAudit = document.querySelector('#auditTable tbody');
+                tbodyAudit.innerHTML = dataAudit.map(log => `
+                    <tr>
+                        <td>#${log.id}</td>
+                        <td class="fw-600">${log.guard_id}</td>
+                        <td>${log.action}</td>
+                        <td class="text-muted">${log.timestamp}</td>
+                    </tr>
+                `).join('');
+                
+            } catch (error) {
+                console.error("Failed to load dashboard data", error);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            
+            document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function markReturned(id) {
+            if(confirm("Tandai mahasiswa ini sudah kembali? Riwayat keluarnya akan dihapus.")) {
+                try {
+                    const res = await fetch(`/api/delete_entry/${id}`, { method: 'DELETE' });
+                    if(res.ok) {
+                        loadDashboardData();
+                    } else {
+                        alert("Gagal memperbarui status.");
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+        }
+
+        async function markAllReturned() {
+            if(confirm("Tandai SEMUA mahasiswa sudah kembali? Seluruh riwayat keluar akan dihapus!")) {
+                try {
+                    const res = await fetch('/api/delete_all_entries', { method: 'DELETE' });
+                    if(res.ok) {
+                        loadDashboardData();
+                    } else {
+                        alert("Gagal menghapus riwayat.");
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+        }
+
+        // Initialize and setup auto-refresh
+        loadDashboardData();
+        setInterval(loadDashboardData, 10000);
+    </script>
+</body>
+</html>

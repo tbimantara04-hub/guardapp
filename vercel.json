@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "guard_app/backend/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "guard_app/backend/app.py"
+    }
+  ]
+}

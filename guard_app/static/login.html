@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Keamanan Gate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js"></script>
+    <style>
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-panel {
+            max-width: 400px;
+            width: 100%;
+        }
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper login-wrapper">
+        <div class="glass-panel login-panel">
+            <header>
+                <div class="logo">
+                    <span id="logo_text">🛡️ Poltek SSN</span>
+                </div>
+                <div class="security-badge">
+                    <span class="icon">🔒</span> Secure Login (RSA Encrypted)
+                </div>
+                <h1 id="page_title">Sistem Log Keamanan</h1>
+                <p id="page_subtitle">Silakan login untuk melanjutkan</p>
+            </header>
+
+            <main>
+                <div id="errorMsg" class="error-message">Username atau password salah.</div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Masukkan username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Masukkan password" required>
+                    </div>
+
+                    <button type="submit" id="loginBtn" class="btn-primary">
+                        <span class="btn-text">Masuk</span>
+                        <div class="spinner" id="spinner"></div>
+                    </button>
+                </form>
+            </main>
+        </div>
+    </div>
+    <script src="login.js"></script>
+</body>
+</html>
